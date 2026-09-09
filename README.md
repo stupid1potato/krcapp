@@ -221,6 +221,31 @@ xlsx, Google Sheets, 행 단위 인라인 편집, 기존 경기와의 부분 병
 | `npm run vapid` | VAPID 키 출력 |
 | `npm test` | CSV 가져오기 · 공지 팝업 단위 테스트 |
 
-## 프로덕션 참고
+## 프로덕션 실행
 
-SQLite 파일은 `prisma/dev.db`에 생성됩니다. 서버리스 배포보다는 디스크가 있는 호스트(VPS, Docker 볼륨 등)에 맞습니다. `AUTH_SECRET`과 VAPID 개인키는 저장소에 커밋하지 마세요.
+특정 호스팅 업체에 묶이지 않습니다. Node.js 20+가 돌아가는 일반 호스트에서 실행합니다.
+
+`.env`를 프로덕션 값으로 채운 뒤(아래와 `.env.example` 주석 참고) 스키마를 반영하고 빌드합니다. 시드가 필요하면 `npm run db:setup`, 스키마만이면 `npm run db:push`입니다.
+
+```bash
+npm run build && npm start
+```
+
+기본 포트는 3000입니다. `PORT`로 바꿀 수 있습니다. `AUTH_SECRET`과 VAPID 개인키는 저장소에 커밋하지 마세요.
+
+### AUTH_URL과 VAPID (localhost 금지)
+
+프로덕션에서는 **실제 공개 URL**을 씁니다. `localhost` / `127.0.0.1`은 개발 전용입니다.
+
+- `AUTH_URL`: 사용자가 여는 origin. 예 `https://krc.example.com` (끝 슬래시 없음). 배포는 HTTPS가 필요합니다.
+- VAPID: `npm run vapid`로 **프로덕션용** 공개/개인 키 쌍을 만들고 `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`에 넣습니다. `VAPID_SUBJECT`는 `mailto:운영자@실제도메인` 또는 같은 공개 HTTPS URL이어야 하며 localhost를 넣지 마세요.
+- `NEXT_PUBLIC_VAPID_PUBLIC_KEY`는 `npm run build` 때 클라이언트 번들에 들어갑니다. 키를 바꾸면 다시 빌드하세요.
+
+### SQLite 파일 경로
+
+`DATABASE_URL="file:./dev.db"`는 **`prisma/` 디렉터리 기준** 상대 경로라서 실제 파일은 `prisma/dev.db`입니다.
+
+- 재시작·재배포 후에도 남는 **영구 디스크**의 절대 경로를 쓰세요. 예: `DATABASE_URL="file:/var/lib/krcapp/prod.db"`
+- 임시 파일시스템에 두면 대진표·계정·푸시 구독이 재시작 때 사라집니다.
+- 프로세스에 쓰기 권한이 있어야 하고, 같은 디렉터리에 `.db-wal` / `.db-shm`이 생깁니다.
+- SQLite는 한 호스트의 로컬 파일에 맞습니다. 읽기 전용 디스크나 요청마다 디스크가 비는 환경에는 맞지 않습니다.
