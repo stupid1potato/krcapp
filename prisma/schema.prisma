@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  matches   Match[]
+  notices   Notice[]
+}
+
+model Team {
+  id            String             @id @default(cuid())
+  number        String             @unique
+  name          String
+  users         User[]
+  slots         MatchSlot[]
+  subscriptions PushSubscription[]
+}
+
+model User {
+  id            String             @id @default(cuid())
+  username      String             @unique
+  email         String
+  passwordHash  String
+  role          String             @default("participant")
+  teamId        String?
+  team          Team?              @relation(fields: [teamId], references: [id])
+  subscriptions PushSubscription[]
+}
+
+model Match {
+  id           String      @id @default(cuid())
+  eventId      String
+  event        Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  number       Int
+  status       String
+  redScore     Int?
+  blueScore    Int?
+  entryCloseAt DateTime
+  startAt      DateTime
+  slots        MatchSlot[]
+
+  @@unique([eventId, number])
+}
+
+model MatchSlot {
+  id        String  @id @default(cuid())
+  matchId   String
+  match     Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  teamId    String
+  team      Team    @relation(fields: [teamId], references: [id])
+  alliance  String
+  station   Int
+  checkedIn Boolean @default(false)
+
+  @@unique([matchId, alliance, station])
+}
+
+model Notice {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+}

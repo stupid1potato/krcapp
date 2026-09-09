@@ -1,0 +1,118 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { MatchCard } from "@/components/MatchCard";
+import { ScheduleTabs } from "@/components/ScheduleTabs";
+import { TeamModal } from "@/components/TeamModal";
+import type { EventScheduleDTO, TeamRef } from "@/lib/types";
+
+export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" }) {
+  const { data: session } = useSession();
+  const myTeamNumber = session?.user?.teamNumber ?? null;
+  const [tab, setTab] = useState<"mine" | "all">(variant === "admin" ? "all" : "mine");
+  const [schedule, setSchedule] = useState<EventScheduleDTO | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<TeamRef | null>(null);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/matches", { cache: "no-store" });
+      if (!res.ok) throw new Error("대진표를 불러오지 못했습니다.");
+      const data = (await res.json()) as EventScheduleDTO;
+      setSchedule(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "대진표를 불러오지 못했습니다.");
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+    const id = window.setInterval(() => void load(), 10_000);
+    return () => window.clearInterval(id);
+  }, [load]);
+
+  const matches = useMemo(() => {
+    if (!schedule) return [];
+    if (tab === "all" || variant === "admin") return schedule.matches;
+    if (!myTeamNumber) return [];
+    return schedule.matches.filter((match) =>
+      match.slots.some((slot) => slot.team.number === myTeamNumber),
+    );
+  }, [schedule, tab, myTeamNumber, variant]);
+
+  return (
+    <div className={variant === "admin" ? "" : ""}>
+      {variant === "app" ? (
+        <>
+          <div className="px-4 pb-3 pt-4">
+            <h1 className="text-[28px] font-bold leading-none text-black">대진표</h1>
+            <p className="mt-2 text-[14px] text-neutral-400">{schedule?.name ?? " "}</p>
+          </div>
+          <ScheduleTabs value={tab} onChange={setTab} />
+        </>
+      ) : (
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-[28px] font-bold text-black">경기 진행 현황</h1>
+            <p className="mt-2 max-w-2xl text-[13px] leading-5 text-neutral-500">
+              참가자 대진표와 같은 카드입니다. 10초마다 새로고침되며, 팀을 눌러 체크인하거나 알림을
+              보낼 수 있습니다.
+            </p>
+          </div>
+          <p className="text-[14px] text-neutral-500">
+            {schedule?.name} · {schedule?.matchCount ?? 0}경기
+          </p>
+        </div>
+      )}
+
+      {error ? <p className="px-4 py-6 text-sm text-red-500">{error}</p> : null}
+
+      {variant === "app" && tab === "mine" && !myTeamNumber ? (
+        <div className="mx-4 mt-8 rounded-2xl border border-neutral-200 px-5 py-8 text-center">
+          <p className="text-[15px] text-neutral-600">로그인하면 우리 팀 경기를 볼 수 있습니다.</p>
+          <Link
+            href="/login"
+            className="mt-4 inline-flex rounded-full bg-sage px-5 py-2.5 text-sm font-medium text-white"
+          >
+            로그인
+          </Link>
+        </div>
+      ) : null}
+
+      {variant === "app" && tab === "mine" && myTeamNumber && matches.length === 0 && schedule ? (
+        <p className="px-4 py-10 text-center text-sm text-neutral-400">우리 팀 경기가 없습니다.</p>
+      ) : null}
+
+      <div
+        className={
+          variant === "admin"
+            ? "mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+            : "mt-4 flex flex-col gap-3 px-3 pb-4"
+        }
+      >
+        {matches.map((match) => (
+          <MatchCard
+            key={match.id}
+            match={match}
+            myTeamNumber={myTeamNumber}
+            onSelectTeam={setSelected}
+          />
+        ))}
+      </div>
+
+      {selected ? (
+        <TeamModal
+          key={`${selected.slotId}-${selected.checkedIn}`}
+          team={selected}
+          onClose={() => setSelected(null)}
+          onChanged={() => {
+            void load();
+          }}
+        />
+      ) : null}
+    </div>
+  );
+}

@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-sage: #84a59d;
+  --color-sage-dark: #6b8f86;
+  --color-alliance-red: #e23b3b;
+  --color-alliance-blue: #3b6fdb;
+  --color-win-red: #f6e6e3;
+  --color-win-blue: #e4ecf6;
+  --color-live: #e6f0e7;
+  --color-mine: #2f9e5d;
+  --font-sans: var(--font-noto-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-noto-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html,
+body {
+  background: #ffffff;
+  color: #111111;
+}
+
+body {
+  font-family: var(--font-sans);
+  min-height: 100%;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
