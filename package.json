@@ -7,13 +7,12 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test lib/notice-popup.test.ts",
+    "test": "tsx --test lib/csv-import.test.ts lib/notice-popup.test.ts",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:setup": "prisma db push && tsx prisma/seed.ts",
-    "vapid": "node scripts/generate-vapid.mjs",
-    "test": "tsx --test lib/csv-import.test.ts"
+    "vapid": "node scripts/generate-vapid.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
