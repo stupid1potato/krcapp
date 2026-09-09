@@ -16,7 +16,7 @@ export function AdminDashboard() {
   const [tab, setTab] = useState<Tab>("progress");
 
   return (
-    <div>
+    <div className="min-w-0 max-w-full">
       <div className="mb-6 grid w-full grid-cols-2 gap-2 md:max-w-md">
         {TABS.map((item) => {
           const selected = tab === item.id;

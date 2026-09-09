@@ -21,7 +21,7 @@ function PreviewTable({ preview }: { preview: FilePreview }) {
   }, [preview.rows]);
 
   return (
-    <section className="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+    <section className="mt-6 w-full min-w-0 overflow-hidden rounded-2xl border border-neutral-200 bg-white">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 px-4 py-3">
         <h3 className="min-w-0 truncate text-[16px] font-semibold text-black">
           {preview.kind === "teams" ? "teams.csv" : "matches.csv"}
@@ -43,7 +43,7 @@ function PreviewTable({ preview }: { preview: FilePreview }) {
       {preview.rows.length === 0 ? (
         <p className="px-4 py-6 text-[13px] text-neutral-400">데이터 행이 없습니다.</p>
       ) : (
-        <div className="max-w-full overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
+        <div className="w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
           <table
             className={`w-max min-w-full text-left text-[13px] ${
               preview.kind === "matches" ? "min-w-[52rem]" : "min-w-[28rem]"
@@ -71,7 +71,7 @@ function PreviewTable({ preview }: { preview: FilePreview }) {
                         {row.values[column] || <span className="text-neutral-300">—</span>}
                       </td>
                     ))}
-                    <td className="min-w-[9rem] max-w-[16rem] px-3 py-2 align-top whitespace-normal">
+                    <td className="min-w-[180px] max-w-[16rem] px-3 py-2 align-top whitespace-normal">
                       {bad ? row.errors.join(" · ") : <span className="text-neutral-300">OK</span>}
                     </td>
                   </tr>
@@ -161,7 +161,7 @@ export function ImportView({ onApplied }: Props) {
   const canApply = Boolean(preview?.canApply && hasFiles && busy === null);
 
   return (
-    <div className="pb-16">
+    <div className="min-w-0 max-w-full overflow-x-hidden pb-16">
       <div className="mb-5">
         <h1 className="text-[22px] font-medium text-black md:text-[28px]">데이터 가져오기</h1>
         <p className="mt-2 max-w-2xl text-[13px] leading-5 text-neutral-500">

@@ -109,7 +109,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="mx-auto min-h-dvh w-full min-w-0 max-w-[430px] overflow-x-clip bg-white px-4 min-[390px]:px-6">
+    <div className="mx-auto min-h-dvh w-full min-w-0 max-w-[430px] overflow-x-hidden bg-white px-4 min-[390px]:px-6">
       <TopBar />
       <div className="pt-6 min-[390px]:pt-8">
         <h1 className="text-[22px] font-medium text-black min-[390px]:text-[24px]">로그인</h1>

@@ -126,7 +126,7 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
           <div
             className={
               variant === "admin"
-                ? "mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3"
+                ? "mt-4 grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3"
                 : "mt-4 flex min-w-0 flex-col gap-3 px-3 pb-4"
             }
           >

@@ -24,8 +24,8 @@ export default async function AdminPage() {
   }
 
   return (
-    <div className="min-h-dvh overflow-x-clip bg-neutral-50 px-3 py-5 min-[390px]:px-4 md:px-8 md:py-6">
-      <div className="mx-auto mb-4 flex max-w-6xl items-center justify-between gap-3">
+    <div className="min-h-dvh min-w-0 overflow-x-hidden bg-neutral-50 px-3 py-5 min-[390px]:px-4 md:px-8 md:py-6">
+      <div className="mx-auto mb-4 flex w-full min-w-0 max-w-6xl items-center justify-between gap-3">
         <Link href="/" className="text-sm text-sage">
           ← 참가자 대진표
         </Link>
@@ -33,7 +33,7 @@ export default async function AdminPage() {
           프로필
         </Link>
       </div>
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto w-full min-w-0 max-w-6xl overflow-x-hidden">
         <AdminDashboard />
       </div>
     </div>

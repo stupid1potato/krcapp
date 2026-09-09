@@ -18,7 +18,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-1/2 z-30 w-full max-w-[430px] -translate-x-1/2 border-t border-neutral-200 bg-white">
+    <nav className="fixed bottom-0 left-1/2 z-30 w-full max-w-[min(100%,430px)] -translate-x-1/2 border-t border-neutral-200 bg-white">
       <div className="grid grid-cols-2 pb-[env(safe-area-inset-bottom)]">
         {ITEMS.map(({ href, label, Icon, isActive }) => {
           const active = isActive(pathname);
