@@ -94,7 +94,7 @@ async function main() {
   const demoUsers = [
     { username: "28657", email: "28657@krc.app", role: "participant", teamNumber: "28657" },
     { username: "33863", email: "33863@krc.app", role: "participant", teamNumber: "33863" },
-    { username: "admin", email: "admin@krc.app", role: "admin", teamNumber: null },
+    { username: "admin", email: "admin@krc.app", role: "staff", teamNumber: null },
   ];
 
   for (const demo of demoUsers) {

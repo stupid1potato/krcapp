@@ -6,11 +6,13 @@ import Link from "next/link";
 import { MatchCard } from "@/components/MatchCard";
 import { ScheduleTabs } from "@/components/ScheduleTabs";
 import { TeamModal } from "@/components/TeamModal";
+import { isStaffRole } from "@/lib/roles";
 import type { EventScheduleDTO, TeamRef } from "@/lib/types";
 
 export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" }) {
   const { data: session } = useSession();
   const myTeamNumber = session?.user?.teamNumber ?? null;
+  const canManage = isStaffRole(session?.user?.role);
   // Default to 전체 대진표 so guests never land on an empty 우리팀 list.
   const [tab, setTab] = useState<"mine" | "all">("all");
   const [schedule, setSchedule] = useState<EventScheduleDTO | null>(null);
@@ -108,6 +110,7 @@ export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" })
         <TeamModal
           key={`${selected.slotId}-${selected.checkedIn}`}
           team={selected}
+          canManage={canManage}
           onClose={() => setSelected(null)}
           onChanged={() => {
             void load();

@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendTeamPush } from "@/lib/push";
+import { requireStaff } from "@/lib/authz";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+
   const body = (await request.json().catch(() => null)) as {
     teamId?: string;
     matchNumber?: number;

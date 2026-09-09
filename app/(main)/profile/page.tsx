@@ -4,6 +4,7 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { usePush } from "@/components/usePush";
+import { isStaffRole } from "@/lib/roles";
 
 export default function ProfilePage() {
   const { data, status } = useSession();
@@ -53,21 +54,14 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {data.user.role === "admin" ? (
+      {isStaffRole(data.user.role) ? (
         <Link
           href="/admin"
           className="mt-4 block rounded-xl border border-neutral-200 py-3 text-center text-[15px] font-medium text-black"
         >
           경기 진행 현황 (운영)
         </Link>
-      ) : (
-        <Link
-          href="/admin"
-          className="mt-4 block text-center text-[13px] text-neutral-400"
-        >
-          경기 진행 현황 보기
-        </Link>
-      )}
+      ) : null}
 
       <button
         type="button"

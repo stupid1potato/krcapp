@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireStaff } from "@/lib/authz";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+
   const body = (await request.json().catch(() => null)) as { slotId?: string } | null;
   const slotId = body?.slotId;
   if (!slotId) {

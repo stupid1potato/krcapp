@@ -7,16 +7,19 @@ export function TeamModal({
   team,
   onClose,
   onChanged,
+  canManage = false,
 }: {
   team: TeamRef;
   onClose: () => void;
   onChanged: () => void;
+  canManage?: boolean;
 }) {
   const [busy, setBusy] = useState<"checkin" | "notify" | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [checkedIn, setCheckedIn] = useState(team.checkedIn);
 
   async function toggleCheckin() {
+    if (!canManage) return;
     setBusy("checkin");
     setMessage(null);
     try {
@@ -37,6 +40,7 @@ export function TeamModal({
   }
 
   async function notify() {
+    if (!canManage) return;
     setBusy("notify");
     setMessage(null);
     try {
@@ -71,35 +75,39 @@ export function TeamModal({
           {checkedIn ? "체크인 완료" : "체크인 안 함"}
         </p>
 
-        <button
-          type="button"
-          onClick={toggleCheckin}
-          disabled={busy !== null}
-          className="mt-6 w-full rounded-xl bg-sage py-3.5 text-[16px] font-medium text-white disabled:opacity-60"
-        >
-          {busy === "checkin"
-            ? "처리 중..."
-            : checkedIn
-              ? "체크인 취소"
-              : "체크인 완료로 표시"}
-        </button>
+        {canManage ? (
+          <>
+            <button
+              type="button"
+              onClick={toggleCheckin}
+              disabled={busy !== null}
+              className="mt-6 w-full rounded-xl bg-sage py-3.5 text-[16px] font-medium text-white disabled:opacity-60"
+            >
+              {busy === "checkin"
+                ? "처리 중..."
+                : checkedIn
+                  ? "체크인 취소"
+                  : "체크인 완료로 표시"}
+            </button>
 
-        <button
-          type="button"
-          onClick={notify}
-          disabled={busy !== null}
-          className="mt-3 w-full rounded-xl border border-sage py-3.5 text-[16px] font-medium text-sage disabled:opacity-60"
-        >
-          {busy === "notify" ? "전송 중..." : "알림호출"}
-        </button>
+            <button
+              type="button"
+              onClick={notify}
+              disabled={busy !== null}
+              className="mt-3 w-full rounded-xl border border-sage py-3.5 text-[16px] font-medium text-sage disabled:opacity-60"
+            >
+              {busy === "notify" ? "전송 중..." : "알림호출"}
+            </button>
+          </>
+        ) : (
+          <p className="mt-6 text-[13px] leading-5 text-neutral-400">
+            체크인과 알림호출은 운영 계정만 사용할 수 있습니다.
+          </p>
+        )}
 
         {message ? <p className="mt-3 text-[13px] leading-5 text-neutral-500">{message}</p> : null}
 
-        <button
-          type="button"
-          onClick={onClose}
-          className="mt-4 text-[15px] text-neutral-400"
-        >
+        <button type="button" onClick={onClose} className="mt-4 text-[15px] text-neutral-400">
           닫기
         </button>
       </div>
