@@ -24,7 +24,7 @@ export default function NoticeDetailPage() {
   return (
     <div className="px-4 pt-4">
       <Link href="/notices" className="text-[14px] text-sage">
-        ← 공지 목록
+        ← 공지
       </Link>
 
       {notice === undefined ? (

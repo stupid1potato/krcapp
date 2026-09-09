@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { isStaffRole } from "@/lib/roles";
 import { ScheduleView } from "@/components/ScheduleView";
+import { NoticeComposer } from "@/components/NoticeComposer";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,7 @@ export default async function AdminPage() {
         </Link>
       </div>
       <ScheduleView variant="admin" />
+      <NoticeComposer />
     </div>
   );
 }

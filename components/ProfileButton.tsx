@@ -1,15 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { ProfileIcon } from "@/components/icons";
 
 export function ProfileButton() {
   const { data, status } = useSession();
+  const pathname = usePathname();
+  const callback =
+    pathname.startsWith("/notices") ||
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/bracket")
+      ? pathname
+      : "/";
   const href =
     status === "authenticated" && data?.user
       ? "/profile"
-      : "/login?callbackUrl=%2F";
+      : `/login?callbackUrl=${encodeURIComponent(callback)}`;
 
   return (
     <Link
