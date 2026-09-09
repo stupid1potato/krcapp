@@ -15,7 +15,7 @@ FTC(First Tech Challenge) 스타일 대회 참가자용 대진표 웹앱입니�
 - 팀 탭 모달: 참가자는 체크인 상태만 조회(읽기 전용). **체크인 / 알림호출** 은 운영(staff)만
 - 로그인(팀 번호 + 비밀번호), 프로필(기어 아이콘), 로그아웃
 - 하단 탭은 **공지 | 대진표** 두 개만 (홈/내 정보는 없음)
-- `/admin` 경기 진행 현황 그리드 (10초 자동 새로고침, **staff 전용**)
+- `/admin` 경기 진행 현황 그리드 (10초 자동 새로고침, **staff 전용**)와 **데이터 가져오기** (CSV)
 - 라이브 시계(1초), 대진표 폴링(10초)
 
 ## 필요 환경
@@ -75,7 +75,7 @@ npm run dev
 
 로그인 실패 시 팀 번호는 유지하고 비밀번호만 지웁니다. 빨간 배너 `Sign in failed. Check the details you provided are correct.` 와 빨간 입력 테두리가 표시됩니다. 기본 도착지는 **대진표**(`/`, 우리팀 세그먼트)입니다. 공지에서 로그인하면 공지로 돌아옵니다. 대진표 탭은 공지로 바뀌지 않습니다.
 
-`POST /api/checkin` 과 `POST /api/notify` 는 로그인된 **staff** 세션만 허용합니다. 비로그인 401, 참가자 403. `/admin` 도 staff 전용입니다 (비로그인 → 로그인 페이지, 참가자 → 403).
+`POST /api/checkin` 과 `POST /api/notify`, `POST /api/admin/import/preview`, `POST /api/admin/import/apply` 는 로그인된 **staff** 세션만 허용합니다. 비로그인 401, 참가자 403. `/admin` 도 staff 전용입니다 (비로그인 → 로그인 페이지, 참가자 → 403).
 
 시드 데이터: 이벤트 **울산프리미어리그 테스트**, 16경기(종료·진행중·예정 혼합), 공지 2건. 공지가 없으면 `아직 공지가 없습니다`가 표시됩니다.
 
@@ -109,7 +109,47 @@ npm run dev
 | `/notices/[id]` | 공지 상세 |
 | `/login` | 로그인 |
 | `/profile` | 프로필 · 로그아웃 · 알림 |
-| `/admin` | 경기 진행 현황 그리드 |
+| `/admin` | 경기 진행 현황 · CSV 데이터 가져오기 (staff) |
+
+## 관리자 CSV 가져오기
+
+`/admin`에서 **진행 현황 | 데이터 가져오기** 세그먼트를 전환합니다. 운영(staff)만 접근합니다.
+
+### 흐름
+
+1. `teams.csv`와 `matches.csv`를 하나 또는 둘 다 업로드합니다. 페이지에서 양식을 내려받을 수 있습니다 (`/templates/teams.csv`, `/templates/matches.csv`).
+2. 서버가 검증한 뒤 미리보기를 보여 줍니다. 오류 행은 빨간색으로 강조됩니다.
+3. 오류가 1건이라도 있으면 **이번 대회 교체**가 비활성화됩니다.
+4. 확인 대화상자에서 **이번 대회 교체**를 누르면 현재 대회 데이터가 트랜잭션으로 반영됩니다.
+5. 성공하면 **진행 현황** 탭으로 이동합니다.
+
+xlsx, Google Sheets, 행 단위 인라인 편집, 기존 경기와의 부분 병합은 지원하지 않습니다. `matches.csv`를 적용하면 해당 파일이 현재 대회의 전체 경기 목록이 됩니다(없는 경기 번호는 삭제, 있는 번호는 upsert).
+
+### teams.csv
+
+열 이름은 snake_case입니다. **password 열은 없습니다.**
+
+| 열 | 필수 | 설명 |
+| --- | --- | --- |
+| `team_number` | 예 | 로그인 아이디가 되는 팀 번호 |
+| `team_name` | 예 | 팀 이름 |
+| `email` | 아니오 | 기본값 `{team_number}@krc.app` |
+| `role` | 아니오 | 기본값 `participant`. `staff`/`admin`은 거절 |
+
+적용 시 Team을 upsert하고, 같은 번호의 참가자 User를 upsert합니다. 비밀번호는 기존 앱 규칙과 같이 **이메일 문자열**을 bcrypt로 해시한 값입니다. CSV로 운영 계정을 만들거나 덮어쓰지 않습니다.
+
+### matches.csv
+
+| 열 | 필수 | 설명 |
+| --- | --- | --- |
+| `match_number` | 예 | 현재 대회 기준 경기 번호 |
+| `red1`, `red2`, `blue1`, `blue2` | 예 | 팀 번호. 모르면 해당 행 오류 |
+| `entry_close_at` | 예 | `YYYY-MM-DDTHH:mm`(KST) 또는 타임존이 있는 ISO |
+| `start_at` | 예 | 동일 |
+| `status` | 아니오 | `SCHEDULED`(기본), `IN_PROGRESS`, `FINISHED` |
+| `red_score`, `blue_score` | 아니오 | 정수 |
+
+알 수 없는 팀 번호는 미리보기 행 오류입니다. `teams.csv`에 있는 새 번호는 같은 업로드에서 경기에 쓸 수 있습니다.
 
 ## 스택
 
@@ -127,6 +167,7 @@ npm run dev
 | `npm run start` | 빌드 결과 실행 |
 | `npm run db:setup` | `prisma db push` + seed |
 | `npm run vapid` | VAPID 키 출력 |
+| `npm test` | CSV 가져오기 단위 테스트 |
 
 ## 프로덕션 참고
 
