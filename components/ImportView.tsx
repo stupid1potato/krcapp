@@ -240,7 +240,11 @@ export function ImportView({ onApplied }: Props) {
           type="button"
           onClick={() => setConfirmOpen(true)}
           disabled={!canApply}
-          className="rounded-xl bg-red-600 px-5 py-2.5 text-[15px] font-medium text-white disabled:opacity-40"
+          className={`rounded-xl px-5 py-2.5 text-[15px] font-medium ${
+            canApply
+              ? "bg-red-600 text-white"
+              : "cursor-not-allowed bg-neutral-200 text-neutral-400"
+          }`}
         >
           이번 대회 교체
         </button>
