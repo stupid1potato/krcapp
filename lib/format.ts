@@ -19,6 +19,17 @@ export function formatHm(iso: string) {
   }).format(new Date(iso));
 }
 
+export function formatNoticeTime(iso: string) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: KST,
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date(iso));
+}
+
 export function statusLabel(status: string) {
   if (status === "FINISHED") return "종료";
   if (status === "IN_PROGRESS") return "진행중";

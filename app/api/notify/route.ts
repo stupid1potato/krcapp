@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     teamId: team.id,
     title: "알림호출",
     body: `${team.number} 팀, ${matchLabel} 경기장으로 와 주세요.`,
-    url: "/",
+    url: body.matchNumber ? `/?match=${body.matchNumber}` : "/",
   });
 
   return NextResponse.json({

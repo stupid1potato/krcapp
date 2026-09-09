@@ -7,19 +7,21 @@ import { TopBar } from "@/components/TopBar";
 
 function postLoginPath(callbackUrl: string | null) {
   const raw = callbackUrl?.trim() || "/";
-  let path = raw;
+  let parsed: URL;
   try {
-    if (raw.startsWith("http://") || raw.startsWith("https://")) {
-      path = new URL(raw).pathname || "/";
-    }
+    parsed = raw.startsWith("http://") || raw.startsWith("https://")
+      ? new URL(raw)
+      : new URL(raw, "http://localhost");
   } catch {
     return "/";
   }
-  if (!path.startsWith("/")) return "/";
-  if (path.startsWith("/login") || path.startsWith("/api") || path.startsWith("/notices")) {
-    return "/";
+  const path = parsed.pathname || "/";
+  const search = parsed.search;
+  if (path.startsWith("/login") || path.startsWith("/api")) return "/";
+  if (path.startsWith("/notices") || path.startsWith("/profile") || path.startsWith("/admin")) {
+    return `${path}${search}`;
   }
-  if (path.startsWith("/profile") || path.startsWith("/admin")) return path;
+  if (path === "/") return `${path}${search}`;
   return "/";
 }
 

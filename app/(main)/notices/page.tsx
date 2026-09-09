@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import type { NoticeDTO } from "@/lib/types";
+import { formatNoticeTime } from "@/lib/format";
 
 export default function NoticesPage() {
   const [notices, setNotices] = useState<NoticeDTO[] | null>(null);
@@ -30,11 +32,14 @@ export default function NoticesPage() {
       ) : (
         <ul className="flex flex-col gap-3 px-4 pb-4">
           {notices.map((notice) => (
-            <li key={notice.id} className="rounded-2xl border border-neutral-200 px-4 py-4">
-              <h2 className="text-[16px] font-semibold text-black">{notice.title}</h2>
-              <p className="mt-2 whitespace-pre-wrap text-[14px] leading-6 text-neutral-600">
-                {notice.body}
-              </p>
+            <li key={notice.id}>
+              <Link
+                href={`/notices/${notice.id}`}
+                className="block rounded-2xl border border-neutral-200 px-4 py-4"
+              >
+                <h2 className="text-[16px] font-semibold text-black">{notice.title}</h2>
+                <p className="mt-2 text-[12px] text-neutral-400">{formatNoticeTime(notice.createdAt)}</p>
+              </Link>
             </li>
           ))}
         </ul>

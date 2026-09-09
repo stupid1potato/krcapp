@@ -152,7 +152,24 @@ async function main() {
     }
   }
 
-  console.log("Seeded event, 24 teams, 16 matches, and demo users.");
+  await prisma.notice.createMany({
+    data: [
+      {
+        eventId: event.id,
+        title: "피트 오픈 안내",
+        body: "오늘 12:30부터 피트를 오픈합니다. 로봇 검사(inspection)를 먼저 받아 주세요.",
+        createdAt: new Date("2026-09-09T09:00:00+09:00"),
+      },
+      {
+        eventId: event.id,
+        title: "경기장 입장",
+        body: "입장마감 시간 전에 경기장 대기줄에 서 주세요. 알림호출이 오면 바로 이동해 주세요.",
+        createdAt: new Date("2026-09-09T10:30:00+09:00"),
+      },
+    ],
+  });
+
+  console.log("Seeded event, 24 teams, 16 matches, notices, and demo users.");
   console.log("Demo logins (username / password):");
   console.log("  28657 / 28657@krc.app");
   console.log("  33863 / 33863@krc.app");

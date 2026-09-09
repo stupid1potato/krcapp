@@ -75,10 +75,12 @@ function TeamRow({
 export function MatchCard({
   match,
   myTeamNumber,
+  highlighted = false,
   onSelectTeam,
 }: {
   match: MatchDTO;
   myTeamNumber?: string | null;
+  highlighted?: boolean;
   onSelectTeam: (team: TeamRef) => void;
 }) {
   const red = match.slots.filter((slot) => slot.alliance === "RED");
@@ -98,7 +100,12 @@ export function MatchCard({
   };
 
   return (
-    <article className={`rounded-[18px] px-3.5 py-3 ${cardTone(match)}`}>
+    <article
+      id={`match-${match.number}`}
+      className={`rounded-[18px] px-3.5 py-3 ${cardTone(match)} ${
+        highlighted ? "ring-2 ring-sage ring-offset-2 ring-offset-white" : ""
+      }`}
+    >
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-[15px] font-semibold text-black">{match.number}경기</h3>
         <span

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MatchCard } from "@/components/MatchCard";
 import { ScheduleTabs } from "@/components/ScheduleTabs";
@@ -9,12 +10,16 @@ import { TeamModal } from "@/components/TeamModal";
 import { isStaffRole } from "@/lib/roles";
 import type { EventScheduleDTO, TeamRef } from "@/lib/types";
 
-export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" }) {
-  const { data: session } = useSession();
+function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
+  const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
   const myTeamNumber = session?.user?.teamNumber ?? null;
   const canManage = isStaffRole(session?.user?.role);
-  // Default to 전체 대진표 so guests never land on an empty 우리팀 list.
-  const [tab, setTab] = useState<"mine" | "all">("all");
+  const highlightNumber = Number(searchParams.get("match"));
+  const hasHighlight = Number.isFinite(highlightNumber) && highlightNumber > 0;
+
+  const [tab, setTab] = useState<"mine" | "all">(variant === "admin" ? "all" : "all");
+  const [tabReady, setTabReady] = useState(variant === "admin");
   const [schedule, setSchedule] = useState<EventScheduleDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<TeamRef | null>(null);
@@ -37,6 +42,22 @@ export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" })
     return () => window.clearInterval(id);
   }, [load]);
 
+  useEffect(() => {
+    if (variant === "admin" || status === "loading" || tabReady) return;
+    setTab(myTeamNumber ? "mine" : "all");
+    setTabReady(true);
+  }, [variant, status, myTeamNumber, tabReady]);
+
+  useEffect(() => {
+    if (variant === "admin" || !schedule || !hasHighlight) return;
+    const match = schedule.matches.find((item) => item.number === highlightNumber);
+    if (!match) return;
+    const inMine = Boolean(
+      myTeamNumber && match.slots.some((slot) => slot.team.number === myTeamNumber),
+    );
+    if (!inMine) setTab("all");
+  }, [variant, schedule, hasHighlight, highlightNumber, myTeamNumber]);
+
   const matches = useMemo(() => {
     if (!schedule) return [];
     if (tab === "all" || variant === "admin") return schedule.matches;
@@ -46,8 +67,15 @@ export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" })
     );
   }, [schedule, tab, myTeamNumber, variant]);
 
+  useEffect(() => {
+    if (!hasHighlight || matches.length === 0) return;
+    const el = document.getElementById(`match-${highlightNumber}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [hasHighlight, highlightNumber, matches, tab]);
+
   return (
-    <div className={variant === "admin" ? "" : ""}>
+    <div>
       {variant === "app" ? (
         <>
           <div className="px-4 pb-3 pt-4">
@@ -77,7 +105,7 @@ export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" })
         <div className="mx-4 mt-8 rounded-2xl border border-neutral-200 px-5 py-8 text-center">
           <p className="text-[15px] text-neutral-600">로그인하면 우리 팀 경기를 볼 수 있습니다.</p>
           <Link
-            href="/login"
+            href="/login?callbackUrl=%2F"
             className="mt-4 inline-flex rounded-full bg-sage px-5 py-2.5 text-sm font-medium text-white"
           >
             로그인
@@ -86,7 +114,11 @@ export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" })
       ) : null}
 
       {variant === "app" && tab === "mine" && myTeamNumber && matches.length === 0 && schedule ? (
-        <p className="px-4 py-10 text-center text-sm text-neutral-400">우리 팀 경기가 없습니다.</p>
+        <p className="px-4 py-10 text-center text-[15px] text-neutral-400">우리 팀 경기가 아직 없어요</p>
+      ) : null}
+
+      {variant === "app" && tab === "all" && schedule && matches.length === 0 ? (
+        <p className="px-4 py-10 text-center text-[15px] text-neutral-400">대진표가 준비 중이에요</p>
       ) : null}
 
       <div
@@ -101,6 +133,7 @@ export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" })
             key={match.id}
             match={match}
             myTeamNumber={myTeamNumber}
+            highlighted={hasHighlight && match.number === highlightNumber}
             onSelectTeam={setSelected}
           />
         ))}
@@ -118,5 +151,13 @@ export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" })
         />
       ) : null}
     </div>
+  );
+}
+
+export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" }) {
+  return (
+    <Suspense fallback={<p className="px-4 py-10 text-sm text-neutral-400">불러오는 중...</p>}>
+      <ScheduleViewInner variant={variant} />
+    </Suspense>
   );
 }
