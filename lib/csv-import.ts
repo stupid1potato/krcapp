@@ -332,11 +332,6 @@ export async function applyImport(uploads: {
     return { ok: false, preview: built.preview };
   }
 
-  const event = await prisma.event.findFirst();
-  if (!event) {
-    return { ok: false, error: "이벤트가 없습니다.", status: 404 };
-  }
-
   const parsedTeams = built.parsedTeams;
   const parsedMatches = built.parsedMatches;
 
@@ -348,113 +343,124 @@ export async function applyImport(uploads: {
     });
   }
 
-  await prisma.$transaction(
-    async (tx) => {
-      const teamIdByNumber = new Map<string, string>();
-
-      if (parsedTeams) {
-        for (const team of parsedTeams) {
-          const saved = await tx.team.upsert({
-            where: { number: team.teamNumber },
-            create: { number: team.teamNumber, name: team.teamName },
-            update: { name: team.teamName },
-          });
-          teamIdByNumber.set(saved.number, saved.id);
-
-          const existingUser = await tx.user.findUnique({ where: { username: team.teamNumber } });
-          if (existingUser && isStaffRole(existingUser.role)) {
-            throw new Error(`운영 계정과 팀 번호가 충돌합니다: ${team.teamNumber}`);
-          }
-
-          await tx.user.upsert({
-            where: { username: team.teamNumber },
-            create: {
-              username: team.teamNumber,
-              email: team.email,
-              passwordHash: passwordByTeam.get(team.teamNumber)!,
-              role: "participant",
-              teamId: saved.id,
-            },
-            update: {
-              email: team.email,
-              passwordHash: passwordByTeam.get(team.teamNumber)!,
-              role: "participant",
-              teamId: saved.id,
-            },
-          });
+  try {
+    const result = await prisma.$transaction(
+      async (tx) => {
+        const currentEvent = await tx.event.findFirst();
+        if (!currentEvent) {
+          throw new Error("MISSING_EVENT");
         }
-      }
 
-      if (parsedMatches) {
-        const dbTeams = await tx.team.findMany({ select: { id: true, number: true } });
-        for (const team of dbTeams) teamIdByNumber.set(team.number, team.id);
+        const teamIdByNumber = new Map<string, string>();
 
-        const matchNumbers = parsedMatches.map((match) => match.matchNumber);
+        if (parsedTeams) {
+          for (const team of parsedTeams) {
+            const saved = await tx.team.upsert({
+              where: { number: team.teamNumber },
+              create: { number: team.teamNumber, name: team.teamName },
+              update: { name: team.teamName },
+            });
+            teamIdByNumber.set(saved.number, saved.id);
 
-        for (const match of parsedMatches) {
-          const saved = await tx.match.upsert({
-            where: { eventId_number: { eventId: event.id, number: match.matchNumber } },
-            create: {
-              eventId: event.id,
-              number: match.matchNumber,
-              status: match.status,
-              redScore: match.redScore,
-              blueScore: match.blueScore,
-              entryCloseAt: match.entryCloseAt,
-              startAt: match.startAt,
-            },
-            update: {
-              status: match.status,
-              redScore: match.redScore,
-              blueScore: match.blueScore,
-              entryCloseAt: match.entryCloseAt,
-              startAt: match.startAt,
-            },
-          });
+            const existingUser = await tx.user.findUnique({ where: { username: team.teamNumber } });
+            if (existingUser && isStaffRole(existingUser.role)) {
+              throw new Error(`운영 계정과 팀 번호가 충돌합니다: ${team.teamNumber}`);
+            }
 
-          await tx.matchSlot.deleteMany({ where: { matchId: saved.id } });
-
-          const slots = [
-            { alliance: "RED", station: 1, number: match.red1 },
-            { alliance: "RED", station: 2, number: match.red2 },
-            { alliance: "BLUE", station: 1, number: match.blue1 },
-            { alliance: "BLUE", station: 2, number: match.blue2 },
-          ];
-
-          for (const slot of slots) {
-            const teamId = teamIdByNumber.get(slot.number);
-            if (!teamId) throw new Error(`알 수 없는 팀 번호입니다: ${slot.number}`);
-            await tx.matchSlot.create({
-              data: {
-                matchId: saved.id,
-                teamId,
-                alliance: slot.alliance,
-                station: slot.station,
-                checkedIn: false,
+            await tx.user.upsert({
+              where: { username: team.teamNumber },
+              create: {
+                username: team.teamNumber,
+                email: team.email,
+                passwordHash: passwordByTeam.get(team.teamNumber)!,
+                role: "participant",
+                teamId: saved.id,
+              },
+              update: {
+                email: team.email,
+                passwordHash: passwordByTeam.get(team.teamNumber)!,
+                role: "participant",
+                teamId: saved.id,
               },
             });
           }
         }
 
-        if (matchNumbers.length === 0) {
-          await tx.match.deleteMany({ where: { eventId: event.id } });
-        } else {
-          await tx.match.deleteMany({
-            where: { eventId: event.id, number: { notIn: matchNumbers } },
-          });
-        }
-      }
-    },
-    { timeout: 20_000 },
-  );
+        if (parsedMatches) {
+          const dbTeams = await tx.team.findMany({ select: { id: true, number: true } });
+          for (const team of dbTeams) teamIdByNumber.set(team.number, team.id);
 
-  return {
-    ok: true,
-    result: {
-      eventName: event.name,
-      teamsUpserted: parsedTeams?.length ?? 0,
-      matchesReplaced: parsedMatches?.length ?? 0,
-      usersUpserted: parsedTeams?.length ?? 0,
-    },
-  };
+          const matchNumbers = parsedMatches.map((match) => match.matchNumber);
+
+          for (const match of parsedMatches) {
+            const saved = await tx.match.upsert({
+              where: { eventId_number: { eventId: currentEvent.id, number: match.matchNumber } },
+              create: {
+                eventId: currentEvent.id,
+                number: match.matchNumber,
+                status: match.status,
+                redScore: match.redScore,
+                blueScore: match.blueScore,
+                entryCloseAt: match.entryCloseAt,
+                startAt: match.startAt,
+              },
+              update: {
+                status: match.status,
+                redScore: match.redScore,
+                blueScore: match.blueScore,
+                entryCloseAt: match.entryCloseAt,
+                startAt: match.startAt,
+              },
+            });
+
+            await tx.matchSlot.deleteMany({ where: { matchId: saved.id } });
+
+            const slots = [
+              { alliance: "RED", station: 1, number: match.red1 },
+              { alliance: "RED", station: 2, number: match.red2 },
+              { alliance: "BLUE", station: 1, number: match.blue1 },
+              { alliance: "BLUE", station: 2, number: match.blue2 },
+            ];
+
+            for (const slot of slots) {
+              const teamId = teamIdByNumber.get(slot.number);
+              if (!teamId) throw new Error(`알 수 없는 팀 번호입니다: ${slot.number}`);
+              await tx.matchSlot.create({
+                data: {
+                  matchId: saved.id,
+                  teamId,
+                  alliance: slot.alliance,
+                  station: slot.station,
+                  checkedIn: false,
+                },
+              });
+            }
+          }
+
+          if (matchNumbers.length === 0) {
+            await tx.match.deleteMany({ where: { eventId: currentEvent.id } });
+          } else {
+            await tx.match.deleteMany({
+              where: { eventId: currentEvent.id, number: { notIn: matchNumbers } },
+            });
+          }
+        }
+
+        return {
+          eventName: currentEvent.name,
+          teamsUpserted: parsedTeams?.length ?? 0,
+          matchesReplaced: parsedMatches?.length ?? 0,
+          usersUpserted: parsedTeams?.length ?? 0,
+        };
+      },
+      { timeout: 20_000 },
+    );
+
+    return { ok: true, result };
+  } catch (error) {
+    if (error instanceof Error && error.message === "MISSING_EVENT") {
+      return { ok: false, error: "이벤트가 없습니다.", status: 404 };
+    }
+    throw error;
+  }
 }
