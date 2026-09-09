@@ -14,7 +14,7 @@ export default async function AdminPage() {
   if (!isStaffRole(session.user.role)) {
     return (
       <div className="mx-auto flex min-h-dvh max-w-[430px] flex-col items-center justify-center px-6 text-center">
-        <h1 className="text-[22px] font-bold text-black">접근 권한이 없습니다</h1>
+        <h1 className="text-[22px] font-medium text-black">접근 권한이 없습니다</h1>
         <p className="mt-2 text-[14px] text-neutral-500">경기 진행 현황은 운영 계정만 볼 수 있습니다.</p>
         <Link href="/" className="mt-6 text-[15px] text-sage">
           대진표로 돌아가기

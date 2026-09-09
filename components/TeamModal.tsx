@@ -68,7 +68,7 @@ export function TeamModal({
         onClick={onClose}
       />
       <div className="relative w-full max-w-[320px] rounded-2xl bg-white px-6 py-7 text-center shadow-xl">
-        <p className="text-[20px] font-semibold text-black">
+        <p className="text-[20px] font-medium text-black">
           {team.number} · {team.name}
         </p>
         <p className="mt-2 text-[14px] text-neutral-400">

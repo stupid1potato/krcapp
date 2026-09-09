@@ -9,7 +9,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       credentials: {
-        username: { label: "Team number", type: "text" },
+        username: { label: "팀 번호", type: "text" },
         password: { label: "비밀번호", type: "password" },
       },
       async authorize(credentials) {

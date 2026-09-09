@@ -24,8 +24,8 @@ export default function ProfilePage() {
 
   return (
     <div className="px-4 pt-4">
-      <h1 className="text-[28px] font-bold text-black">프로필</h1>
-      <p className="mt-6 text-[20px] font-semibold text-black">{label}님 안녕하세요!</p>
+      <h1 className="text-[28px] font-medium text-black">프로필</h1>
+      <p className="mt-6 text-[20px] font-medium text-black">{label}님 안녕하세요!</p>
 
       {!push.supported ? (
         <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-[13px] leading-5 text-amber-800">

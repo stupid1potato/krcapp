@@ -13,7 +13,7 @@ const notoSans = Noto_Sans_KR({
 const notoSerif = Noto_Serif_KR({
   variable: "--font-noto-serif",
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["500", "600"],
 });
 
 const geistMono = Geist_Mono({

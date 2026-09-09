@@ -7,7 +7,7 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("push", (event) => {
-  let data = { title: "KRC APP", body: "", url: "/" };
+  let data = { title: "KRC APP", body: "", url: "/", type: undefined, noticeId: undefined, notice: undefined };
   try {
     if (event.data) data = { ...data, ...event.data.json() };
   } catch {
@@ -15,12 +15,24 @@ self.addEventListener("push", (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(data.title || "KRC APP", {
-      body: data.body || "새 알림이 있습니다.",
-      icon: "/icon-192.png",
-      badge: "/icon-192.png",
-      data: { url: data.url || "/" },
-    }),
+    (async () => {
+      const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      for (const client of clients) {
+        client.postMessage({
+          type: data.type || "push",
+          noticeId: data.noticeId,
+          notice: data.notice,
+          url: data.url || "/",
+        });
+      }
+
+      await self.registration.showNotification(data.title || "KRC APP", {
+        body: data.body || "새 알림이 있습니다.",
+        icon: "/icon-192.png",
+        badge: "/icon-192.png",
+        data: { url: data.url || "/" },
+      });
+    })(),
   );
 });
 

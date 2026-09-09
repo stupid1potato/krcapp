@@ -25,9 +25,9 @@ function badgeClass(status: string) {
 
 function CheckMarker({ checkedIn }: { checkedIn: boolean }) {
   return checkedIn ? (
-    <span className="w-3.5 text-center text-[13px] font-semibold text-mine">O</span>
+    <span className="w-3.5 text-center text-[13px] font-medium text-mine">O</span>
   ) : (
-    <span className="w-3.5 text-center text-[13px] font-semibold text-neutral-400">X</span>
+    <span className="w-3.5 text-center text-[13px] font-medium text-neutral-400">X</span>
   );
 }
 
@@ -52,7 +52,7 @@ function TeamRow({
         onClick={() => onSelect(slot)}
         className="flex w-full items-center gap-1 text-left"
       >
-        <span className="text-[17px] font-bold leading-none text-black">{slot.team.number}</span>
+        <span className="text-[17px] font-semibold leading-none text-black">{slot.team.number}</span>
         <span className={`text-[12px] font-semibold leading-none ${tint}`}>{slot.team.number}</span>
         <CheckMarker checkedIn={slot.checkedIn} />
       </button>
@@ -67,7 +67,7 @@ function TeamRow({
     >
       <CheckMarker checkedIn={slot.checkedIn} />
       <span className={`text-[12px] font-semibold leading-none ${tint}`}>{slot.team.number}</span>
-      <span className="text-[17px] font-bold leading-none text-black">{slot.team.number}</span>
+      <span className="text-[17px] font-semibold leading-none text-black">{slot.team.number}</span>
     </button>
   );
 }
@@ -107,7 +107,7 @@ export function MatchCard({
       }`}
     >
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-[15px] font-semibold text-black">{match.number}경기</h3>
+        <h3 className="text-[15px] font-medium text-black">{match.number}경기</h3>
         <span
           className={`rounded-full border px-2.5 py-[2px] text-[11px] font-medium ${badgeClass(match.status)}`}
         >
@@ -128,7 +128,7 @@ export function MatchCard({
           ))}
         </div>
         <div
-          className={`min-w-[72px] text-center text-[22px] font-bold tracking-wide ${
+          className={`min-w-[72px] text-center text-[22px] font-semibold tracking-wide ${
             finished ? "text-black" : "text-neutral-700"
           }`}
         >

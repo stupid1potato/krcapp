@@ -24,6 +24,54 @@ function configureWebPush() {
   );
 }
 
+type PushPayload = {
+  title: string;
+  body: string;
+  url?: string;
+  type?: string;
+  noticeId?: string;
+  notice?: { id: string; title: string; body: string; createdAt: string };
+};
+
+async function sendToSubscriptions(
+  subscriptions: { id: string; endpoint: string; p256dh: string; auth: string }[],
+  payload: PushPayload,
+) {
+  const body = JSON.stringify({
+    title: payload.title,
+    body: payload.body,
+    url: payload.url ?? "/",
+    type: payload.type,
+    noticeId: payload.noticeId,
+    notice: payload.notice,
+  });
+
+  let sent = 0;
+  let failed = 0;
+
+  for (const sub of subscriptions) {
+    try {
+      await webpush.sendNotification(
+        {
+          endpoint: sub.endpoint,
+          keys: { p256dh: sub.p256dh, auth: sub.auth },
+        },
+        body,
+      );
+      sent += 1;
+    } catch (error) {
+      failed += 1;
+      const status = (error as { statusCode?: number }).statusCode;
+      console.error(`[push] Failed for ${sub.endpoint}:`, error);
+      if (status === 404 || status === 410) {
+        await prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => undefined);
+      }
+    }
+  }
+
+  return { sent, failed, skipped: false as const };
+}
+
 export async function sendTeamPush(options: {
   teamId: string;
   title: string;
@@ -51,40 +99,49 @@ export async function sendTeamPush(options: {
     };
   }
 
-  const payload = JSON.stringify({
+  const result = await sendToSubscriptions(subscriptions, {
     title: options.title,
     body: options.body,
     url: options.url ?? "/",
   });
 
-  let sent = 0;
-  let failed = 0;
+  console.log(`[push] team=${options.teamId} sent=${result.sent} failed=${result.failed}`);
+  return {
+    ...result,
+    message: result.sent > 0 ? `알림을 ${result.sent}대 기기로 보냈습니다.` : "알림 전송에 실패했습니다.",
+  };
+}
 
-  for (const sub of subscriptions) {
-    try {
-      await webpush.sendNotification(
-        {
-          endpoint: sub.endpoint,
-          keys: { p256dh: sub.p256dh, auth: sub.auth },
-        },
-        payload,
-      );
-      sent += 1;
-    } catch (error) {
-      failed += 1;
-      const status = (error as { statusCode?: number }).statusCode;
-      console.error(`[push] Failed for ${sub.endpoint}:`, error);
-      if (status === 404 || status === 410) {
-        await prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => undefined);
-      }
-    }
+export async function sendNoticePush(notice: {
+  id: string;
+  title: string;
+  body: string;
+  createdAt: Date | string;
+}) {
+  if (!vapidConfigured()) {
+    console.warn("[push] VAPID keys missing — skipping notice broadcast.");
+    return { sent: 0, failed: 0, skipped: true as const };
   }
 
-  console.log(`[push] team=${options.teamId} sent=${sent} failed=${failed}`);
-  return {
-    sent,
-    failed,
-    skipped: false,
-    message: sent > 0 ? `알림을 ${sent}대 기기로 보냈습니다.` : "알림 전송에 실패했습니다.",
-  };
+  configureWebPush();
+
+  const subscriptions = await prisma.pushSubscription.findMany();
+  if (subscriptions.length === 0) {
+    console.log("[push] No subscriptions for notice broadcast.");
+    return { sent: 0, failed: 0, skipped: false as const };
+  }
+
+  const createdAt =
+    typeof notice.createdAt === "string" ? notice.createdAt : notice.createdAt.toISOString();
+  const summary = notice.body.length > 120 ? `${notice.body.slice(0, 117)}...` : notice.body;
+  const result = await sendToSubscriptions(subscriptions, {
+    type: "notice",
+    title: notice.title,
+    body: summary,
+    url: "/",
+    noticeId: notice.id,
+    notice: { id: notice.id, title: notice.title, body: notice.body, createdAt },
+  });
+  console.log(`[push] notice=${notice.id} sent=${result.sent} failed=${result.failed}`);
+  return result;
 }
