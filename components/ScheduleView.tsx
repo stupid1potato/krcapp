@@ -18,11 +18,14 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
   const highlightNumber = Number(searchParams.get("match"));
   const hasHighlight = Number.isFinite(highlightNumber) && highlightNumber > 0;
 
-  const [tab, setTab] = useState<"mine" | "all">(variant === "admin" ? "all" : "mine");
-  const [tabReady, setTabReady] = useState(variant === "admin");
+  const [userTab, setUserTab] = useState<"mine" | "all" | null>(null);
   const [schedule, setSchedule] = useState<EventScheduleDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<TeamRef | null>(null);
+
+  const tabReady = variant === "admin" || status !== "loading";
+  const tab: "mine" | "all" =
+    variant === "admin" ? "all" : (userTab ?? (myTeamNumber ? "mine" : "all"));
 
   const load = useCallback(async () => {
     try {
@@ -43,20 +46,14 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
   }, [load]);
 
   useEffect(() => {
-    if (variant === "admin" || status === "loading" || tabReady) return;
-    setTab(myTeamNumber ? "mine" : "all");
-    setTabReady(true);
-  }, [variant, status, myTeamNumber, tabReady]);
-
-  useEffect(() => {
-    if (variant === "admin" || !schedule || !hasHighlight) return;
+    if (variant === "admin" || !tabReady || !schedule || !hasHighlight) return;
     const match = schedule.matches.find((item) => item.number === highlightNumber);
     if (!match) return;
     const inMine = Boolean(
       myTeamNumber && match.slots.some((slot) => slot.team.number === myTeamNumber),
     );
-    if (!inMine) setTab("all");
-  }, [variant, schedule, hasHighlight, highlightNumber, myTeamNumber]);
+    if (!inMine) setUserTab("all");
+  }, [variant, tabReady, schedule, hasHighlight, highlightNumber, myTeamNumber]);
 
   const matches = useMemo(() => {
     if (!schedule) return [];
@@ -82,7 +79,7 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
             <h1 className="text-[28px] font-bold leading-none text-black">대진표</h1>
             <p className="mt-2 text-[14px] text-neutral-400">{schedule?.name ?? " "}</p>
           </div>
-          {tabReady ? <ScheduleTabs value={tab} onChange={setTab} /> : null}
+          {tabReady ? <ScheduleTabs value={tab} onChange={setUserTab} /> : null}
         </>
       ) : (
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
