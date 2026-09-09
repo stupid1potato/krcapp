@@ -159,7 +159,7 @@ export function NoticePopup() {
 
   return (
     <div
-      className={`fixed inset-0 z-40 flex items-center justify-center px-6 transition-opacity duration-150 ease-linear ${
+      className={`fixed inset-0 z-40 flex items-end justify-center px-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))] pt-8 transition-opacity duration-150 ease-linear min-[390px]:items-center min-[390px]:px-6 min-[390px]:pb-8 ${
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
       role="dialog"
@@ -167,7 +167,7 @@ export function NoticePopup() {
       aria-labelledby="notice-popup-title"
     >
       <button type="button" className="absolute inset-0 bg-black/40" aria-label="닫기" onClick={dismissCurrent} />
-      <div className="relative w-full max-w-[320px] rounded-2xl bg-white px-5 py-5 shadow-xl">
+      <div className="relative mb-2 w-full max-w-[min(320px,calc(100vw-2rem))] rounded-2xl bg-white px-5 py-5 shadow-xl min-[390px]:mb-0">
         <span className="inline-flex rounded-full bg-sage/15 px-2.5 py-1 text-[11px] font-medium text-sage">
           새 공지
         </span>
@@ -176,7 +176,11 @@ export function NoticePopup() {
         </h2>
         <p className="mt-2 line-clamp-2 text-[14px] leading-5 text-neutral-500">{notice.body}</p>
         <div className="mt-5 flex items-center justify-between gap-3">
-          <button type="button" onClick={dismissCurrent} className="px-1 text-[15px] font-medium text-neutral-400">
+          <button
+            type="button"
+            onClick={dismissCurrent}
+            className="shrink-0 px-1 text-[15px] font-medium text-neutral-400"
+          >
             닫기
           </button>
           <Link
@@ -184,7 +188,7 @@ export function NoticePopup() {
             onClick={() => {
               dismissedRef.current = new Set(dismissNoticeId(notice.id));
             }}
-            className="inline-flex rounded-xl bg-sage px-4 py-2.5 text-[14px] font-medium text-white"
+            className="inline-flex min-h-[40px] min-w-0 items-center rounded-xl bg-sage px-4 py-2.5 text-[14px] font-medium text-white"
           >
             공지 보기
           </Link>

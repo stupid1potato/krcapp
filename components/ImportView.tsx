@@ -23,7 +23,7 @@ function PreviewTable({ preview }: { preview: FilePreview }) {
   return (
     <section className="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 px-4 py-3">
-        <h3 className="text-[16px] font-semibold text-black">
+        <h3 className="min-w-0 truncate text-[16px] font-semibold text-black">
           {preview.kind === "teams" ? "teams.csv" : "matches.csv"}
         </h3>
         <p className="text-[13px] text-neutral-500">
@@ -43,8 +43,12 @@ function PreviewTable({ preview }: { preview: FilePreview }) {
       {preview.rows.length === 0 ? (
         <p className="px-4 py-6 text-[13px] text-neutral-400">데이터 행이 없습니다.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-[13px]">
+        <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
+          <table
+            className={`w-max min-w-full text-left text-[13px] ${
+              preview.kind === "matches" ? "min-w-[52rem]" : "min-w-[28rem]"
+            }`}
+          >
             <thead className="bg-neutral-50 text-neutral-500">
               <tr>
                 <th className="px-3 py-2 font-medium">행</th>
@@ -67,7 +71,7 @@ function PreviewTable({ preview }: { preview: FilePreview }) {
                         {row.values[column] || <span className="text-neutral-300">—</span>}
                       </td>
                     ))}
-                    <td className="min-w-[180px] px-3 py-2 align-top">
+                    <td className="min-w-[9rem] max-w-[16rem] px-3 py-2 align-top whitespace-normal">
                       {bad ? row.errors.join(" · ") : <span className="text-neutral-300">OK</span>}
                     </td>
                   </tr>
@@ -159,7 +163,7 @@ export function ImportView({ onApplied }: Props) {
   return (
     <div className="pb-16">
       <div className="mb-5">
-        <h1 className="text-[28px] font-medium text-black">데이터 가져오기</h1>
+        <h1 className="text-[22px] font-medium text-black md:text-[28px]">데이터 가져오기</h1>
         <p className="mt-2 max-w-2xl text-[13px] leading-5 text-neutral-500">
           UTF-8 CSV로 현재 대회의 팀과 경기를 교체합니다. 업로드 → 검증 미리보기 → 확인 후 트랜잭션
           반영입니다. 부분 병합은 하지 않으며, 적용 시 기존 경기 체크인 상태는 사라집니다. 운영 계정은
@@ -167,7 +171,7 @@ export function ImportView({ onApplied }: Props) {
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-3 text-[13px]">
+      <div className="flex flex-wrap gap-2 text-[13px] min-[390px]:gap-3">
         <a
           href="/templates/teams.csv"
           download="teams.csv"
@@ -184,24 +188,24 @@ export function ImportView({ onApplied }: Props) {
         </a>
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <label className="rounded-2xl border border-dashed border-neutral-300 bg-white px-4 py-4">
+      <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label className="min-w-0 overflow-hidden rounded-2xl border border-dashed border-neutral-300 bg-white px-4 py-4">
           <span className="block text-[14px] font-medium text-black">teams.csv</span>
-          <span className="mt-1 block text-[12px] text-neutral-400">
+          <span className="mt-1 block text-[12px] leading-5 text-neutral-400">
             UTF-8 · 필수: team_number, team_name · 선택: email, role · password 열 없음
           </span>
           <input
             key={`teams-${inputKey}`}
             type="file"
             accept=".csv,text/csv"
-            className="mt-3 block w-full text-[13px]"
+            className="mt-3 block w-full min-w-0 max-w-full text-[13px] file:mr-3 file:max-w-full"
             onChange={(event) => setTeamsFile(event.target.files?.[0] ?? null)}
           />
-          <span className="mt-2 block text-[12px] text-neutral-500">{fileLabel(teamsFile, "선택 안 함")}</span>
+          <span className="mt-2 block truncate text-[12px] text-neutral-500">{fileLabel(teamsFile, "선택 안 함")}</span>
         </label>
-        <label className="rounded-2xl border border-dashed border-neutral-300 bg-white px-4 py-4">
+        <label className="min-w-0 overflow-hidden rounded-2xl border border-dashed border-neutral-300 bg-white px-4 py-4">
           <span className="block text-[14px] font-medium text-black">matches.csv</span>
-          <span className="mt-1 block text-[12px] text-neutral-400">
+          <span className="mt-1 block text-[12px] leading-5 text-neutral-400">
             UTF-8 · 필수: match_number, red1, red2, blue1, blue2, entry_close_at, start_at · 선택:
             status, red_score, blue_score
           </span>
@@ -209,14 +213,14 @@ export function ImportView({ onApplied }: Props) {
             key={`matches-${inputKey}`}
             type="file"
             accept=".csv,text/csv"
-            className="mt-3 block w-full text-[13px]"
+            className="mt-3 block w-full min-w-0 max-w-full text-[13px] file:mr-3 file:max-w-full"
             onChange={(event) => setMatchesFile(event.target.files?.[0] ?? null)}
           />
-          <span className="mt-2 block text-[12px] text-neutral-500">{fileLabel(matchesFile, "선택 안 함")}</span>
+          <span className="mt-2 block truncate text-[12px] text-neutral-500">{fileLabel(matchesFile, "선택 안 함")}</span>
         </label>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-col gap-2 min-[430px]:flex-row min-[430px]:flex-wrap">
         <button
           type="button"
           onClick={() => void runPreview()}
@@ -269,14 +273,14 @@ export function ImportView({ onApplied }: Props) {
       {preview?.matches ? <PreviewTable preview={preview.matches} /> : null}
 
       {confirmOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 py-6 min-[390px]:items-center">
           <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
             <h2 className="text-[18px] font-medium text-black">이번 대회 교체</h2>
             <p className="mt-2 text-[14px] leading-6 text-neutral-600">
               현재 대회의 팀/경기 데이터를 업로드한 CSV로 바꿉니다. 경기는 전체 교체이며 기존 체크인은
               초기화됩니다. 운영 계정은 유지됩니다. 이 작업은 되돌릴 수 없습니다.
             </p>
-            <div className="mt-5 flex justify-end gap-2">
+            <div className="mt-5 flex flex-col-reverse gap-2 min-[390px]:flex-row min-[390px]:justify-end">
               <button
                 type="button"
                 onClick={() => setConfirmOpen(false)}

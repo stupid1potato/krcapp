@@ -21,7 +21,7 @@ export default function NoticesPage() {
   return (
     <div>
       <div className="px-4 pb-3 pt-4">
-        <h1 className="text-[28px] font-medium leading-none text-black">공지</h1>
+        <h1 className="text-[24px] font-medium leading-none text-black min-[390px]:text-[28px]">공지</h1>
         <p className="mt-2 text-[14px] text-neutral-400">{eventName || "공지사항"}</p>
       </div>
 

@@ -13,7 +13,7 @@ export default async function AdminPage() {
   }
   if (!isStaffRole(session.user.role)) {
     return (
-      <div className="mx-auto flex min-h-dvh max-w-[430px] flex-col items-center justify-center px-6 text-center">
+      <div className="mx-auto flex min-h-dvh max-w-[430px] flex-col items-center justify-center px-4 text-center">
         <h1 className="text-[22px] font-medium text-black">접근 권한이 없습니다</h1>
         <p className="mt-2 text-[14px] text-neutral-500">경기 진행 현황은 운영 계정만 볼 수 있습니다.</p>
         <Link href="/" className="mt-6 text-[15px] text-sage">
@@ -24,8 +24,8 @@ export default async function AdminPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-neutral-50 px-4 py-6 sm:px-8">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="min-h-dvh overflow-x-clip bg-neutral-50 px-3 py-5 min-[390px]:px-4 md:px-8 md:py-6">
+      <div className="mx-auto mb-4 flex max-w-6xl items-center justify-between gap-3">
         <Link href="/" className="text-sm text-sage">
           ← 참가자 대진표
         </Link>
@@ -33,7 +33,9 @@ export default async function AdminPage() {
           프로필
         </Link>
       </div>
-      <AdminDashboard />
+      <div className="mx-auto max-w-6xl">
+        <AdminDashboard />
+      </div>
     </div>
   );
 }

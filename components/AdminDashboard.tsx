@@ -17,7 +17,7 @@ export function AdminDashboard() {
 
   return (
     <div>
-      <div className="mb-6 grid max-w-md grid-cols-2 gap-2">
+      <div className="mb-6 grid w-full grid-cols-2 gap-2 md:max-w-md">
         {TABS.map((item) => {
           const selected = tab === item.id;
           return (
@@ -25,7 +25,7 @@ export function AdminDashboard() {
               key={item.id}
               type="button"
               onClick={() => setTab(item.id)}
-              className={`rounded-full py-2.5 text-[14px] font-medium transition ${
+              className={`rounded-full px-2 py-2.5 text-[13px] font-medium leading-none whitespace-nowrap transition md:text-[14px] ${
                 selected
                   ? "bg-sage text-white"
                   : "border border-neutral-300 bg-white text-neutral-500"

@@ -4,7 +4,7 @@ import { TopBar } from "@/components/TopBar";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-[430px] bg-white">
+    <div className="relative mx-auto min-h-dvh w-full max-w-[430px] overflow-x-clip bg-white">
       <TopBar />
       <main className="pb-24">{children}</main>
       <BottomNav />

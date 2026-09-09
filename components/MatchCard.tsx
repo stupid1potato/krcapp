@@ -45,15 +45,19 @@ function TeamRow({
   const mine = Boolean(myTeamNumber && slot.team.number === myTeamNumber);
   const tint = mine ? "text-mine" : side === "RED" ? "text-alliance-red" : "text-alliance-blue";
 
+  const numberClass =
+    "min-w-0 shrink truncate text-[15px] font-semibold leading-none tabular-nums tracking-tight text-black min-[430px]:text-[17px]";
+  const ghostClass = `hidden min-[480px]:inline shrink-0 text-[12px] font-semibold leading-none ${tint}`;
+
   if (side === "RED") {
     return (
       <button
         type="button"
         onClick={() => onSelect(slot)}
-        className="flex w-full items-center gap-1 text-left"
+        className="flex w-full min-w-0 items-center gap-1 text-left"
       >
-        <span className="text-[17px] font-semibold leading-none text-black">{slot.team.number}</span>
-        <span className={`text-[12px] font-semibold leading-none ${tint}`}>{slot.team.number}</span>
+        <span className={numberClass}>{slot.team.number}</span>
+        <span className={ghostClass}>{slot.team.number}</span>
         <CheckMarker checkedIn={slot.checkedIn} />
       </button>
     );
@@ -63,11 +67,11 @@ function TeamRow({
     <button
       type="button"
       onClick={() => onSelect(slot)}
-      className="flex w-full items-center justify-end gap-1 text-right"
+      className="flex w-full min-w-0 items-center justify-end gap-1 text-right"
     >
       <CheckMarker checkedIn={slot.checkedIn} />
-      <span className={`text-[12px] font-semibold leading-none ${tint}`}>{slot.team.number}</span>
-      <span className="text-[17px] font-semibold leading-none text-black">{slot.team.number}</span>
+      <span className={ghostClass}>{slot.team.number}</span>
+      <span className={numberClass}>{slot.team.number}</span>
     </button>
   );
 }
@@ -102,21 +106,21 @@ export function MatchCard({
   return (
     <article
       id={`match-${match.number}`}
-      className={`rounded-[18px] px-3.5 py-3 ${cardTone(match)} ${
+      className={`min-w-0 overflow-hidden rounded-[18px] px-3 py-3 ${cardTone(match)} ${
         highlighted ? "ring-2 ring-sage ring-offset-2 ring-offset-white" : ""
       }`}
     >
-      <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-[15px] font-medium text-black">{match.number}경기</h3>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <h3 className="min-w-0 truncate text-[15px] font-medium text-black">{match.number}경기</h3>
         <span
-          className={`rounded-full border px-2.5 py-[2px] text-[11px] font-medium ${badgeClass(match.status)}`}
+          className={`shrink-0 rounded-full border px-2 py-[2px] text-[11px] font-medium min-[390px]:px-2.5 ${badgeClass(match.status)}`}
         >
           {statusLabel(match.status)}
         </span>
       </div>
 
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-        <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 min-[430px]:gap-2">
+        <div className="flex min-w-0 flex-col gap-2">
           {red.map((slot) => (
             <TeamRow
               key={slot.id}
@@ -128,13 +132,13 @@ export function MatchCard({
           ))}
         </div>
         <div
-          className={`min-w-[72px] text-center text-[22px] font-semibold tracking-wide ${
+          className={`shrink-0 px-1 text-center text-[18px] font-semibold tracking-wide min-[430px]:min-w-[72px] min-[430px]:text-[22px] ${
             finished ? "text-black" : "text-neutral-700"
           }`}
         >
           {center}
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex min-w-0 flex-col gap-2">
           {blue.map((slot) => (
             <TeamRow
               key={slot.id}
@@ -147,7 +151,7 @@ export function MatchCard({
         </div>
       </div>
 
-      <p className="mt-2.5 text-[11px] text-neutral-400">
+      <p className="mt-2.5 truncate text-[11px] text-neutral-400">
         입장마감 {formatHm(match.entryCloseAt)} · 경기 {formatHm(match.startAt)}
       </p>
     </article>
