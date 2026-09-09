@@ -11,7 +11,8 @@ import type { EventScheduleDTO, TeamRef } from "@/lib/types";
 export function ScheduleView({ variant = "app" }: { variant?: "app" | "admin" }) {
   const { data: session } = useSession();
   const myTeamNumber = session?.user?.teamNumber ?? null;
-  const [tab, setTab] = useState<"mine" | "all">(variant === "admin" ? "all" : "mine");
+  // Default to 전체 대진표 so guests never land on an empty 우리팀 list.
+  const [tab, setTab] = useState<"mine" | "all">("all");
   const [schedule, setSchedule] = useState<EventScheduleDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<TeamRef | null>(null);

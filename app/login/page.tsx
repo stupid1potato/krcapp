@@ -1,15 +1,32 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useRef, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 import { TopBar } from "@/components/TopBar";
+
+function postLoginPath(callbackUrl: string | null) {
+  const raw = callbackUrl?.trim() || "/";
+  let path = raw;
+  try {
+    if (raw.startsWith("http://") || raw.startsWith("https://")) {
+      path = new URL(raw).pathname || "/";
+    }
+  } catch {
+    return "/";
+  }
+  if (!path.startsWith("/")) return "/";
+  if (path.startsWith("/login") || path.startsWith("/api") || path.startsWith("/notices")) {
+    return "/";
+  }
+  if (path.startsWith("/profile") || path.startsWith("/admin")) return path;
+  return "/";
+}
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const passwordRef = useRef<HTMLInputElement>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [failed, setFailed] = useState(false);
@@ -23,14 +40,15 @@ function LoginForm() {
       username,
       password,
       redirect: false,
-      callbackUrl,
     });
     setBusy(false);
-    if (result?.error) {
+    if (!result || result.error || result.ok === false) {
       setFailed(true);
+      setPassword("");
+      requestAnimationFrame(() => passwordRef.current?.focus());
       return;
     }
-    router.push(result?.url || callbackUrl);
+    router.replace(postLoginPath(searchParams.get("callbackUrl")));
     router.refresh();
   }
 
@@ -55,10 +73,11 @@ function LoginForm() {
         className={fieldClass}
       />
       <input
+        ref={passwordRef}
         name="password"
         type="password"
         autoComplete="current-password"
-        placeholder="email"
+        placeholder="비밀번호"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         className={fieldClass}
@@ -80,9 +99,7 @@ export default function LoginPage() {
       <TopBar />
       <div className="pt-8">
         <h1 className="text-[24px] font-bold text-black">로그인</h1>
-        <p className="mt-2 text-[14px] text-neutral-500">
-          팀 번호와 이메일로 로그인하세요.
-        </p>
+        <p className="mt-2 text-[14px] text-neutral-500">팀 번호와 비밀번호로 로그인하세요.</p>
         <Suspense>
           <LoginForm />
         </Suspense>

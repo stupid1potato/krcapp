@@ -6,7 +6,10 @@ import { ProfileIcon } from "@/components/icons";
 
 export function ProfileButton() {
   const { data, status } = useSession();
-  const href = status === "authenticated" && data?.user ? "/profile" : "/login";
+  const href =
+    status === "authenticated" && data?.user
+      ? "/profile"
+      : "/login?callbackUrl=%2F";
 
   return (
     <Link

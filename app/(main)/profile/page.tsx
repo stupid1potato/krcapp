@@ -15,7 +15,7 @@ export default function ProfilePage() {
   }
 
   if (status !== "authenticated" || !data?.user) {
-    router.replace("/login");
+    router.replace("/login?callbackUrl=%2Fprofile");
     return null;
   }
 
