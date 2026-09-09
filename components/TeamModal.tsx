@@ -99,11 +99,7 @@ export function TeamModal({
               {busy === "notify" ? "전송 중..." : "알림호출"}
             </button>
           </>
-        ) : (
-          <p className="mt-6 text-[13px] leading-5 text-neutral-400">
-            체크인과 알림호출은 운영 계정만 사용할 수 있습니다.
-          </p>
-        )}
+        ) : null}
 
         {message ? <p className="mt-3 text-[13px] leading-5 text-neutral-500">{message}</p> : null}
 

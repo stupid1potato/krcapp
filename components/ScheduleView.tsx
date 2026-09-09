@@ -101,7 +101,7 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
 
       {error ? <p className="px-4 py-6 text-sm text-red-500">{error}</p> : null}
 
-      {variant === "app" && tab === "mine" && !myTeamNumber ? (
+      {variant === "app" && tab === "mine" && status !== "loading" && !session?.user ? (
         <div className="mx-4 mt-8 rounded-2xl border border-neutral-200 px-5 py-8 text-center">
           <p className="text-[15px] text-neutral-600">로그인하면 우리 팀 경기를 볼 수 있습니다.</p>
           <Link
@@ -113,7 +113,11 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
         </div>
       ) : null}
 
-      {variant === "app" && tab === "mine" && myTeamNumber && matches.length === 0 && schedule ? (
+      {variant === "app" &&
+      tab === "mine" &&
+      session?.user &&
+      matches.length === 0 &&
+      schedule ? (
         <p className="px-4 py-10 text-center text-[15px] text-neutral-400">우리 팀 경기가 아직 없어요</p>
       ) : null}
 

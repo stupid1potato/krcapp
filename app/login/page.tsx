@@ -21,7 +21,7 @@ function postLoginPath(callbackUrl: string | null) {
   if (path.startsWith("/notices") || path.startsWith("/profile") || path.startsWith("/admin")) {
     return `${path}${search}`;
   }
-  if (path === "/") return `${path}${search}`;
+  if (path === "/" || path.startsWith("/bracket")) return `${path}${search}`;
   return "/";
 }
 

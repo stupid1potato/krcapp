@@ -6,7 +6,12 @@ import { BellIcon, TrophyIcon } from "@/components/icons";
 
 const ITEMS = [
   { href: "/notices", label: "공지", Icon: BellIcon, isActive: (path: string) => path.startsWith("/notices") },
-  { href: "/", label: "대진표", Icon: TrophyIcon, isActive: (path: string) => path === "/" },
+  {
+    href: "/",
+    label: "대진표",
+    Icon: TrophyIcon,
+    isActive: (path: string) => path === "/" || path.startsWith("/bracket"),
+  },
 ] as const;
 
 export function BottomNav() {

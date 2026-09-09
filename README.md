@@ -104,7 +104,7 @@ npm run dev
 
 | 경로 | 설명 |
 | --- | --- |
-| `/` | 대진표 (`?match=n` 딥링크) |
+| `/` 또는 `/bracket` | 대진표 (`?match=n` 딥링크) |
 | `/notices` | 공지 목록 |
 | `/notices/[id]` | 공지 상세 |
 | `/login` | 로그인 |
