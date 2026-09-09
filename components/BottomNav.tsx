@@ -18,15 +18,15 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-30">
-      <div className="pointer-events-auto mx-auto grid w-full max-w-[430px] grid-cols-2 border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-1/2 z-30 w-full max-w-[430px] -translate-x-1/2 border-t border-neutral-200 bg-white">
+      <div className="grid grid-cols-2 pb-[env(safe-area-inset-bottom)]">
         {ITEMS.map(({ href, label, Icon, isActive }) => {
           const active = isActive(pathname);
           return (
             <Link
               key={href}
               href={href}
-              className={`flex min-h-[52px] flex-col items-center justify-center gap-0.5 py-2 text-[11px] leading-none ${
+              className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center gap-0.5 py-2 text-[11px] leading-none ${
                 active ? "text-black" : "text-neutral-400"
               }`}
             >

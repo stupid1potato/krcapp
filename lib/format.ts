@@ -1,33 +1,35 @@
-const KST = "Asia/Seoul";
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+function pad2(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+/** KST wall time without Intl — Node/browser locale data cannot diverge. */
+export function kstParts(date: Date) {
+  const shifted = new Date(date.getTime() + KST_OFFSET_MS);
+  return {
+    year: shifted.getUTCFullYear(),
+    month: shifted.getUTCMonth() + 1,
+    day: shifted.getUTCDate(),
+    hour: shifted.getUTCHours(),
+    minute: shifted.getUTCMinutes(),
+    second: shifted.getUTCSeconds(),
+  };
+}
 
 export function formatClock(date: Date) {
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: KST,
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  }).format(date);
+  const { hour, minute, second } = kstParts(date);
+  return `${pad2(hour)}:${pad2(minute)}:${pad2(second)}`;
 }
 
 export function formatHm(iso: string) {
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: KST,
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date(iso));
+  const { hour, minute } = kstParts(new Date(iso));
+  return `${pad2(hour)}:${pad2(minute)}`;
 }
 
 export function formatNoticeTime(iso: string) {
-  return new Intl.DateTimeFormat("ko-KR", {
-    timeZone: KST,
-    month: "numeric",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date(iso));
+  const { month, day, hour, minute } = kstParts(new Date(iso));
+  return `${month}. ${day}. ${pad2(hour)}:${pad2(minute)}`;
 }
 
 export function statusLabel(status: string) {

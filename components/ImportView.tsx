@@ -43,7 +43,7 @@ function PreviewTable({ preview }: { preview: FilePreview }) {
       {preview.rows.length === 0 ? (
         <p className="px-4 py-6 text-[13px] text-neutral-400">데이터 행이 없습니다.</p>
       ) : (
-        <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
+        <div className="max-w-full overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
           <table
             className={`w-max min-w-full text-left text-[13px] ${
               preview.kind === "matches" ? "min-w-[52rem]" : "min-w-[28rem]"
