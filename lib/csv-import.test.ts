@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { parseCsvTable, parseImportDateTime } from "./csv";
+import { decodeUtf8Csv, parseCsvTable, parseImportDateTime } from "./csv";
 import { buildImport } from "./csv-import";
 import type { ImportContext } from "./csv-import";
 
@@ -9,6 +9,13 @@ const ctx: ImportContext = {
   existingTeamNumbers: new Set(["28657", "33863"]),
   staffUsernames: new Set(["admin"]),
 };
+
+test("UTF-8 Korean team names survive decode and parse", () => {
+  const bytes = new TextEncoder().encode("team_number,team_name\n10001,울산알파\n");
+  const table = parseCsvTable(decodeUtf8Csv(bytes));
+  assert.ok(!("error" in table));
+  assert.equal(table.rows[0]?.values.team_name, "울산알파");
+});
 
 test("parseCsvTable reads headers, quotes, and skips blank rows", () => {
   const table = parseCsvTable(

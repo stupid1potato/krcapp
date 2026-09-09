@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { isStaffRole } from "@/lib/roles";
 import {
+  decodeUtf8Csv,
   isEmail,
   parseCsvTable,
   parseImportDateTime,
@@ -302,7 +303,7 @@ export async function readCsvUploads(request: Request) {
       return text ? { fileName: `${field}.csv`, text } : null;
     }
     if (entry.size === 0) return null;
-    const text = await entry.text();
+    const text = decodeUtf8Csv(await entry.arrayBuffer());
     if (!text.trim()) return null;
     return { fileName: entry.name || `${field}.csv`, text };
   }

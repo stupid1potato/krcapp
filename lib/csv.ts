@@ -8,6 +8,12 @@ export type CsvTable = {
   rows: { line: number; values: Record<string, string> }[];
 };
 
+/** Decode CSV bytes as UTF-8. A leading BOM is stripped later in `parseCsv`. */
+export function decodeUtf8Csv(bytes: ArrayBuffer | Uint8Array) {
+  const view = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  return new TextDecoder("utf-8").decode(view);
+}
+
 export function parseCsv(text: string): { records: CsvRecord[] } | { error: string } {
   const src = text.replace(/^\uFEFF/, "");
   const records: CsvRecord[] = [];

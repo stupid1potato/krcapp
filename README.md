@@ -117,7 +117,7 @@ npm run dev
 
 ### 흐름
 
-1. `teams.csv`와 `matches.csv`를 하나 또는 둘 다 업로드합니다. 페이지에서 양식을 내려받을 수 있습니다 (`/templates/teams.csv`, `/templates/matches.csv`).
+1. UTF-8 `teams.csv`와 `matches.csv`를 하나 또는 둘 다 업로드합니다. 페이지에서 양식을 내려받을 수 있습니다 (`/templates/teams.csv`, `/templates/matches.csv`).
 2. 서버가 검증한 뒤 미리보기를 보여 줍니다. 오류 행은 빨간색으로 강조됩니다.
 3. 오류가 1건이라도 있으면 **이번 대회 교체**가 비활성화됩니다.
 4. 확인 대화상자에서 **이번 대회 교체**를 누르면 현재 대회 데이터가 트랜잭션으로 반영됩니다.
@@ -127,7 +127,7 @@ xlsx, Google Sheets, 행 단위 인라인 편집, 기존 경기와의 부분 병
 
 ### teams.csv
 
-열 이름은 snake_case입니다. **password 열은 없습니다.**
+인코딩은 **UTF-8**입니다. 열 이름은 snake_case입니다. **password 열은 없습니다.**
 
 | 열 | 필수 | 설명 |
 | --- | --- | --- |
@@ -139,6 +139,8 @@ xlsx, Google Sheets, 행 단위 인라인 편집, 기존 경기와의 부분 병
 적용 시 Team을 upsert하고, 같은 번호의 참가자 User를 upsert합니다. 비밀번호는 기존 앱 규칙과 같이 **이메일 문자열**을 bcrypt로 해시한 값입니다. CSV로 운영 계정을 만들거나 덮어쓰지 않습니다.
 
 ### matches.csv
+
+인코딩은 **UTF-8**입니다.
 
 | 열 | 필수 | 설명 |
 | --- | --- | --- |

@@ -161,8 +161,9 @@ export function ImportView({ onApplied }: Props) {
       <div className="mb-5">
         <h1 className="text-[28px] font-bold text-black">데이터 가져오기</h1>
         <p className="mt-2 max-w-2xl text-[13px] leading-5 text-neutral-500">
-          현재 대회의 팀과 경기를 CSV로 교체합니다. 부분 병합은 하지 않으며, 적용 시 기존 경기
-          체크인 상태는 사라집니다. 운영 계정은 CSV로 만들지 않습니다.
+          UTF-8 CSV로 현재 대회의 팀과 경기를 교체합니다. 업로드 → 검증 미리보기 → 확인 후 트랜잭션
+          반영입니다. 부분 병합은 하지 않으며, 적용 시 기존 경기 체크인 상태는 사라집니다. 운영 계정은
+          CSV로 만들지 않습니다.
         </p>
       </div>
 
@@ -172,14 +173,14 @@ export function ImportView({ onApplied }: Props) {
           download="teams.csv"
           className="rounded-full border border-neutral-300 bg-white px-4 py-2 text-neutral-700"
         >
-          teams.csv 양식
+          teams.csv 양식 (UTF-8)
         </a>
         <a
           href="/templates/matches.csv"
           download="matches.csv"
           className="rounded-full border border-neutral-300 bg-white px-4 py-2 text-neutral-700"
         >
-          matches.csv 양식
+          matches.csv 양식 (UTF-8)
         </a>
       </div>
 
@@ -187,7 +188,7 @@ export function ImportView({ onApplied }: Props) {
         <label className="rounded-2xl border border-dashed border-neutral-300 bg-white px-4 py-4">
           <span className="block text-[14px] font-medium text-black">teams.csv</span>
           <span className="mt-1 block text-[12px] text-neutral-400">
-            필수: team_number, team_name · 비밀번호 열 없음
+            UTF-8 · 필수: team_number, team_name · 선택: email, role · password 열 없음
           </span>
           <input
             key={`teams-${inputKey}`}
@@ -201,7 +202,8 @@ export function ImportView({ onApplied }: Props) {
         <label className="rounded-2xl border border-dashed border-neutral-300 bg-white px-4 py-4">
           <span className="block text-[14px] font-medium text-black">matches.csv</span>
           <span className="mt-1 block text-[12px] text-neutral-400">
-            필수: match_number, red1, red2, blue1, blue2, entry_close_at, start_at
+            UTF-8 · 필수: match_number, red1, red2, blue1, blue2, entry_close_at, start_at · 선택:
+            status, red_score, blue_score
           </span>
           <input
             key={`matches-${inputKey}`}
