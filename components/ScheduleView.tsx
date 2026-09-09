@@ -18,7 +18,7 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
   const highlightNumber = Number(searchParams.get("match"));
   const hasHighlight = Number.isFinite(highlightNumber) && highlightNumber > 0;
 
-  const [tab, setTab] = useState<"mine" | "all">(variant === "admin" ? "all" : "all");
+  const [tab, setTab] = useState<"mine" | "all">(variant === "admin" ? "all" : "mine");
   const [tabReady, setTabReady] = useState(variant === "admin");
   const [schedule, setSchedule] = useState<EventScheduleDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +82,7 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
             <h1 className="text-[28px] font-bold leading-none text-black">대진표</h1>
             <p className="mt-2 text-[14px] text-neutral-400">{schedule?.name ?? " "}</p>
           </div>
-          <ScheduleTabs value={tab} onChange={setTab} />
+          {tabReady ? <ScheduleTabs value={tab} onChange={setTab} /> : null}
         </>
       ) : (
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
@@ -101,47 +101,53 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
 
       {error ? <p className="px-4 py-6 text-sm text-red-500">{error}</p> : null}
 
-      {variant === "app" && tab === "mine" && status !== "loading" && !session?.user ? (
-        <div className="mx-4 mt-8 rounded-2xl border border-neutral-200 px-5 py-8 text-center">
-          <p className="text-[15px] text-neutral-600">로그인하면 우리 팀 경기를 볼 수 있습니다.</p>
-          <Link
-            href="/login?callbackUrl=%2F"
-            className="mt-4 inline-flex rounded-full bg-sage px-5 py-2.5 text-sm font-medium text-white"
+      {variant === "app" && !tabReady ? (
+        <p className="px-4 py-10 text-sm text-neutral-400">불러오는 중...</p>
+      ) : (
+        <>
+          {variant === "app" && tab === "mine" && status !== "loading" && !session?.user ? (
+            <div className="mx-4 mt-8 rounded-2xl border border-neutral-200 px-5 py-8 text-center">
+              <p className="text-[15px] text-neutral-600">로그인하면 우리 팀 경기를 볼 수 있습니다.</p>
+              <Link
+                href="/login?callbackUrl=%2F"
+                className="mt-4 inline-flex rounded-full bg-sage px-5 py-2.5 text-sm font-medium text-white"
+              >
+                로그인
+              </Link>
+            </div>
+          ) : null}
+
+          {variant === "app" &&
+          tab === "mine" &&
+          session?.user &&
+          matches.length === 0 &&
+          schedule ? (
+            <p className="px-4 py-10 text-center text-[15px] text-neutral-400">우리 팀 경기가 아직 없어요</p>
+          ) : null}
+
+          {variant === "app" && tab === "all" && schedule && matches.length === 0 ? (
+            <p className="px-4 py-10 text-center text-[15px] text-neutral-400">대진표가 준비 중이에요</p>
+          ) : null}
+
+          <div
+            className={
+              variant === "admin"
+                ? "mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+                : "mt-4 flex flex-col gap-3 px-3 pb-4"
+            }
           >
-            로그인
-          </Link>
-        </div>
-      ) : null}
-
-      {variant === "app" &&
-      tab === "mine" &&
-      session?.user &&
-      matches.length === 0 &&
-      schedule ? (
-        <p className="px-4 py-10 text-center text-[15px] text-neutral-400">우리 팀 경기가 아직 없어요</p>
-      ) : null}
-
-      {variant === "app" && tab === "all" && schedule && matches.length === 0 ? (
-        <p className="px-4 py-10 text-center text-[15px] text-neutral-400">대진표가 준비 중이에요</p>
-      ) : null}
-
-      <div
-        className={
-          variant === "admin"
-            ? "mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
-            : "mt-4 flex flex-col gap-3 px-3 pb-4"
-        }
-      >
-        {matches.map((match) => (
-          <MatchCard
-            key={match.id}
-            match={match}
-            myTeamNumber={myTeamNumber}
-            highlighted={hasHighlight && match.number === highlightNumber}
-            onSelectTeam={setSelected}
-          />
-        ))}
-      </div>
+            {matches.map((match) => (
+              <MatchCard
+                key={match.id}
+                match={match}
+                myTeamNumber={myTeamNumber}
+                highlighted={hasHighlight && match.number === highlightNumber}
+                onSelectTeam={setSelected}
+              />
+            ))}
+          </div>
+        </>
+      )}
 
       {selected ? (
         <TeamModal
