@@ -88,8 +88,7 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
             {schedule?.name} · {schedule?.matchCount ?? 0}경기
           </p>
           <p className="mt-2 max-w-2xl text-[13px] leading-5 text-neutral-500">
-            참가자 대진표와 같은 카드입니다. 10초마다 새로고침되며, 팀을 눌러 체크인하거나 알림을 보낼
-            수 있습니다.
+            참가자와 같은 카드입니다. 10초마다 새로고침되며, 팀을 눌러 체크인·알림호출할 수 있습니다.
           </p>
         </div>
       )}
