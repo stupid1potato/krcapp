@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireStaff } from "@/lib/authz";
+import { sendNoticePush } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +45,10 @@ export async function POST(request: Request) {
 
   const notice = await prisma.notice.create({
     data: { eventId: event.id, title, body: text },
+  });
+
+  void sendNoticePush(notice).catch((error) => {
+    console.error("[push] notice broadcast failed:", error);
   });
 
   return NextResponse.json({

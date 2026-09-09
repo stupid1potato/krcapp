@@ -11,7 +11,7 @@ export function TopBar() {
 
   return (
     <header className="relative px-4 pb-1 pt-3 text-center">
-      <Link href="/" className="font-serif text-[28px] font-semibold leading-none tracking-tight text-black">
+      <Link href="/" className="font-serif text-[28px] font-medium leading-none tracking-tight text-black">
         KRC APP
       </Link>
       <LiveClock className="mt-1 block font-mono text-[13px] tracking-wide text-neutral-400" />

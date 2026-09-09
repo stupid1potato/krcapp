@@ -7,13 +7,13 @@ import "./globals.css";
 const notoSans = Noto_Sans_KR({
   variable: "--font-noto-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
 });
 
 const notoSerif = Noto_Serif_KR({
   variable: "--font-noto-serif",
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["500", "600"],
 });
 
 const geistMono = Geist_Mono({

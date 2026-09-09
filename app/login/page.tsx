@@ -55,41 +55,53 @@ function LoginForm() {
   }
 
   const fieldClass = failed
-    ? "w-full rounded-lg border-2 border-red-500 bg-white px-3 py-3 text-[15px] outline-none"
-    : "w-full rounded-lg border border-neutral-300 bg-white px-3 py-3 text-[15px] outline-none focus:border-sage";
+    ? "w-full rounded-xl border-2 border-red-500 bg-white px-3 py-3.5 text-[15px] outline-none"
+    : "w-full rounded-xl border border-neutral-300 bg-white px-3 py-3.5 text-[15px] outline-none focus:border-sage";
 
   return (
-    <form onSubmit={onSubmit} className="mt-8 space-y-3">
+    <form onSubmit={onSubmit} className="mt-6 space-y-4">
       {failed ? (
         <div className="rounded-md bg-red-50 px-3 py-3 text-[13px] leading-5 text-red-600">
-          Sign in failed. Check the details you provided are correct.
+          로그인에 실패했습니다. 팀 번호와 비밀번호를 확인해 주세요.
         </div>
       ) : null}
 
-      <input
-        name="username"
-        autoComplete="username"
-        placeholder="Team number"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        className={fieldClass}
-      />
-      <input
-        ref={passwordRef}
-        name="password"
-        type="password"
-        autoComplete="current-password"
-        placeholder="비밀번호"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className={fieldClass}
-      />
+      <div>
+        <label htmlFor="team-number" className="mb-1.5 block text-[13px] font-medium text-neutral-700">
+          팀 번호
+        </label>
+        <input
+          id="team-number"
+          name="username"
+          autoComplete="username"
+          placeholder=""
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className={fieldClass}
+        />
+      </div>
+      <div>
+        <label htmlFor="password" className="mb-1.5 block text-[13px] font-medium text-neutral-700">
+          비밀번호
+        </label>
+        <input
+          id="password"
+          ref={passwordRef}
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          placeholder=""
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className={fieldClass}
+        />
+      </div>
       <button
         type="submit"
         disabled={busy}
-        className="mt-2 w-full rounded-lg bg-[#2563eb] py-3.5 text-[16px] font-semibold text-white disabled:opacity-60"
+        className="w-full rounded-lg bg-[#2563eb] py-3.5 text-[16px] font-medium text-white disabled:opacity-60"
       >
-        {busy ? "Signing in..." : "Sign in with KRC APP"}
+        {busy ? "로그인 중..." : "로그인"}
       </button>
     </form>
   );
@@ -100,7 +112,7 @@ export default function LoginPage() {
     <div className="mx-auto min-h-dvh w-full max-w-[430px] bg-white px-6">
       <TopBar />
       <div className="pt-8">
-        <h1 className="text-[24px] font-bold text-black">로그인</h1>
+        <h1 className="text-[24px] font-medium text-black">로그인</h1>
         <p className="mt-2 text-[14px] text-neutral-500">팀 번호와 비밀번호로 로그인하세요.</p>
         <Suspense>
           <LoginForm />
