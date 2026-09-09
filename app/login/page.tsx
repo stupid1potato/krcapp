@@ -59,7 +59,7 @@ function LoginForm() {
     : "w-full rounded-xl border border-neutral-300 bg-white px-3 py-3.5 text-[15px] outline-none focus:border-sage";
 
   return (
-    <form onSubmit={onSubmit} className="mt-8 space-y-4">
+    <form onSubmit={onSubmit} className="mt-6 space-y-4">
       {failed ? (
         <div className="rounded-md bg-red-50 px-3 py-3 text-[13px] leading-5 text-red-600">
           로그인에 실패했습니다. 팀 번호와 비밀번호를 확인해 주세요.
