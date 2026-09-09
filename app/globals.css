@@ -14,10 +14,16 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
+html {
+  color-scheme: light;
+}
+
 html,
 body {
   background: #ffffff;
   color: #111111;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {

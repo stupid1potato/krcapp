@@ -76,22 +76,19 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
       {variant === "app" ? (
         <>
           <div className="px-4 pb-3 pt-4">
-            <h1 className="text-[28px] font-medium leading-none text-black">대진표</h1>
+            <h1 className="text-[24px] font-medium leading-none text-black min-[390px]:text-[28px]">대진표</h1>
             <p className="mt-2 text-[14px] text-neutral-400">{schedule?.name ?? " "}</p>
           </div>
           {tabReady ? <ScheduleTabs value={tab} onChange={setUserTab} /> : null}
         </>
       ) : (
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-[28px] font-medium text-black">경기 진행 현황</h1>
-            <p className="mt-2 max-w-2xl text-[13px] leading-5 text-neutral-500">
-              참가자 대진표와 같은 카드입니다. 10초마다 새로고침되며, 팀을 눌러 체크인하거나 알림을
-              보낼 수 있습니다.
-            </p>
-          </div>
-          <p className="text-[14px] text-neutral-500">
+        <div className="mb-5">
+          <h1 className="text-[22px] font-medium leading-tight text-black md:text-[28px]">경기 진행 현황</h1>
+          <p className="mt-1 text-[13px] text-neutral-500 md:text-[14px]">
             {schedule?.name} · {schedule?.matchCount ?? 0}경기
+          </p>
+          <p className="mt-2 max-w-2xl text-[13px] leading-5 text-neutral-500">
+            참가자와 같은 카드입니다. 10초마다 새로고침되며, 팀을 눌러 체크인·알림호출할 수 있습니다.
           </p>
         </div>
       )}
@@ -129,8 +126,8 @@ function ScheduleViewInner({ variant = "app" }: { variant?: "app" | "admin" }) {
           <div
             className={
               variant === "admin"
-                ? "mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
-                : "mt-4 flex flex-col gap-3 px-3 pb-4"
+                ? "mt-4 grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3"
+                : "mt-4 flex min-w-0 flex-col gap-3 px-3 pb-4"
             }
           >
             {matches.map((match) => (

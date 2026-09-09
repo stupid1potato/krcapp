@@ -24,7 +24,7 @@ export function ProfileButton() {
     <Link
       href={href}
       aria-label={status === "authenticated" ? "프로필" : "로그인"}
-      className="absolute right-4 top-1 flex h-9 w-9 items-center justify-center rounded-full text-neutral-800"
+      className="absolute right-3 top-1 flex h-9 w-9 items-center justify-center rounded-full text-neutral-800 min-[390px]:right-4"
     >
       <ProfileIcon className="h-8 w-8" />
     </Link>

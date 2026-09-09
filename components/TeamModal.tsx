@@ -60,14 +60,14 @@ export function TeamModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <button
         type="button"
         className="absolute inset-0 bg-black/40"
         aria-label="닫기"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-[320px] rounded-2xl bg-white px-6 py-7 text-center shadow-xl">
+      <div className="relative w-full max-w-[min(320px,calc(100vw-2rem))] rounded-2xl bg-white px-5 py-6 text-center shadow-xl min-[390px]:px-6 min-[390px]:py-7">
         <p className="text-[20px] font-medium text-black">
           {team.number} · {team.name}
         </p>

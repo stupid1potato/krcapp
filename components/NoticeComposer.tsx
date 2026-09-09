@@ -31,7 +31,7 @@ export function NoticeComposer() {
   }
 
   return (
-    <section className="mt-10 max-w-xl rounded-2xl border border-neutral-200 bg-white p-5">
+    <section className="mt-10 w-full max-w-xl rounded-2xl border border-neutral-200 bg-white p-4 min-[390px]:p-5">
       <h2 className="text-[18px] font-medium text-black">공지 작성</h2>
       <p className="mt-1 text-[13px] text-neutral-500">참가자 앱에는 작성 버튼이 없습니다. 여기와 시드로만 등록합니다.</p>
       <form onSubmit={onSubmit} className="mt-4 space-y-3">
